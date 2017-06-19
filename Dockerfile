@@ -53,5 +53,6 @@ RUN \
 
 VOLUME $HOME
 EXPOSE 4369 5671 5672 15672 25672
+RUN chmod +x /launch.sh
 ENTRYPOINT ["/launch.sh"]
 CMD ["rabbitmq-server"]
