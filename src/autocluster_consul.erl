@@ -44,12 +44,10 @@ nodelist() ->
                               autocluster_config:get(consul_svc)],
                              node_list_qargs()) of
     {ok, Nodes} ->
-      Result = extract_nodes(
+      {ok, extract_nodes(
              filter_nodes(Nodes,
-                          autocluster_config:get(consul_include_nodes_with_warnings))),
-      {ok, Result};
-    {error, _} = Error ->
-          Error
+                          autocluster_config:get(consul_include_nodes_with_warnings)))};
+    Error       -> Error
   end.
 
 
@@ -63,7 +61,7 @@ lock(Who) ->
     case create_session(Who, autocluster_config:get(consul_svc_ttl)) of
         {ok, SessionId} ->
             start_session_ttl_updater(SessionId),
-            Now = erlang:system_time(seconds),
+            Now = time_compat:erlang_system_time(seconds),
             EndTime = Now + autocluster_config:get(lock_wait_time),
             lock(SessionId, Now, EndTime);
         {error, Reason} ->
@@ -135,10 +133,10 @@ lock(SessionId, _, EndTime) ->
         {ok, false} ->
             case get_lock_status() of
                 {ok, {SessionHeld, ModifyIndex}} ->
-                    Wait = max(EndTime - erlang:system_time(seconds), 0),
+                    Wait = max(EndTime - time_compat:erlang_system_time(seconds), 0),
                     case wait_for_lock_release(SessionHeld, ModifyIndex, Wait) of
                         ok ->
-                            lock(SessionId, erlang:system_time(seconds), EndTime);
+                            lock(SessionId, time_compat:erlang_system_time(seconds), EndTime);
                         {error, Reason} ->
                             {error, lists:flatten(io_lib:format("Error waiting for lock release, reason: ~s",[Reason]))}
                     end;
@@ -244,10 +242,10 @@ maybe_add_acl(QArgs) ->
 filter_nodes(Nodes, Warn) ->
   case Warn of
     true ->
-      lists:filter(fun(Node) ->
-                    Checks = maps:get(<<"Checks">>, Node),
-                    lists:all(fun(Check) ->
-                      lists:member(maps:get(<<"Status">>, Check),
+      lists:filter(fun({struct, Node}) ->
+                    Checks = proplists:get_value(<<"Checks">>, Node),
+                    lists:all(fun({struct, Check}) ->
+                      lists:member(proplists:get_value(<<"Status">>, Check),
                                    [<<"passing">>, <<"warning">>])
                               end,
                               Checks)
@@ -280,13 +278,13 @@ extract_nodes(Data) -> extract_nodes(Data, []).
 -spec extract_nodes(ConsulResult :: list(), Nodes :: list())
     -> list().
 extract_nodes([], Nodes)    -> Nodes;
-extract_nodes([H|T], Nodes) ->
-  Service = maps:get(<<"Service">>, H),
-  Value = maps:get(<<"Address">>, Service),
+extract_nodes([{struct, H}|T], Nodes) ->
+  {struct, Service} = proplists:get_value(<<"Service">>, H),
+  Value = proplists:get_value(<<"Address">>, Service),
   NodeName = case autocluster_util:as_string(Value) of
     "" ->
-      NodeData = maps:get(<<"Node">>, H),
-      Node = maps:get(<<"Node">>, NodeData),
+      {struct, NodeData} = proplists:get_value(<<"Node">>, H),
+      Node = proplists:get_value(<<"Node">>, NodeData),
       maybe_add_domain(autocluster_util:node_name(Node));
     Address ->
       autocluster_util:node_name(Address)
@@ -655,11 +653,10 @@ maybe_add_domain(Value) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec serialize_json_body(term()) -> {ok, Payload :: binary()} | {error, atom()}.
-
 serialize_json_body([]) -> {ok, []};
 serialize_json_body(Payload) ->
-    case rabbit_json:try_encode(Payload) of
-        {ok, Body} -> {ok, rabbit_data_coercion:to_binary(Body)};
+    case rabbit_misc:json_encode(Payload) of
+        {ok, Body} -> {ok, list_to_binary(Body)};
         {error, Reason} -> {error, Reason}
     end.
 
@@ -674,9 +671,7 @@ serialize_json_body(Payload) ->
 %% @end
 %%--------------------------------------------------------------------
 -spec get_session_id(term()) -> string().
-get_session_id(Maps) ->
-    ID = maps:get(<<"ID">>, Maps),
-    binary:bin_to_list(ID).
+get_session_id({struct, [{_, ID} | _]}) -> binary:bin_to_list(ID).
 
 
 %%--------------------------------------------------------------------
@@ -808,7 +803,7 @@ release_lock(SessionId) ->
 -spec get_lock_status() -> {ok, term()} | {error, string()}.
 get_lock_status() ->
     case consul_kv_read(startup_lock_path(), maybe_add_acl([])) of
-        {ok, [KeyData | _]} ->
+        {ok, [{struct, KeyData} | _]} ->
             SessionHeld = proplists:get_value(<<"Session">>, KeyData) =/= undefined,
             ModifyIndex = proplists:get_value(<<"ModifyIndex">>, KeyData),
             {ok, {SessionHeld, ModifyIndex}};

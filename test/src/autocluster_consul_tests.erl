@@ -186,7 +186,7 @@ nodelist_test_() ->
           meck:expect(autocluster_httpc, get,
             fun(_, _, _, _, _) ->
               Body = "[{\"Node\": {\"Node\": \"rabbit2.internal.domain\", \"Address\": \"10.20.16.160\"}, \"Checks\": [{\"Node\": \"rabbit2.internal.domain\", \"CheckID\": \"service:rabbitmq\", \"Name\": \"Service \'rabbitmq\' check\", \"ServiceName\": \"rabbitmq\", \"Notes\": \"Connect to the port internally every 30 seconds\", \"Status\": \"passing\", \"ServiceID\": \"rabbitmq\", \"Output\": \"\"}, {\"Node\": \"rabbit2.internal.domain\", \"CheckID\": \"serfHealth\", \"Name\": \"Serf Health Status\", \"ServiceName\": \"\", \"Notes\": \"\", \"Status\": \"passing\", \"ServiceID\": \"\", \"Output\": \"Agent alive and reachable\"}], \"Service\": {\"Address\": \"\", \"Port\": 5672, \"ID\": \"rabbitmq\", \"Service\": \"rabbitmq\", \"Tags\": [\"amqp\"]}}, {\"Node\": {\"Node\": \"rabbit1.internal.domain\", \"Address\": \"10.20.16.159\"}, \"Checks\": [{\"Node\": \"rabbit1.internal.domain\", \"CheckID\": \"service:rabbitmq\", \"Name\": \"Service \'rabbitmq\' check\", \"ServiceName\": \"rabbitmq\", \"Notes\": \"Connect to the port internally every 30 seconds\", \"Status\": \"passing\", \"ServiceID\": \"rabbitmq\", \"Output\": \"\"}, {\"Node\": \"rabbit1.internal.domain\", \"CheckID\": \"serfHealth\", \"Name\": \"Serf Health Status\", \"ServiceName\": \"\", \"Notes\": \"\", \"Status\": \"passing\", \"ServiceID\": \"\", \"Output\": \"Agent alive and reachable\"}], \"Service\": {\"Address\": \"\", \"Port\": 5672, \"ID\": \"rabbitmq\", \"Service\": \"rabbitmq\", \"Tags\": [\"amqp\"]}}]",
-              json_decode(Body)
+              rabbit_misc:json_decode(Body)
             end),
           Expectation = {ok,['rabbit@rabbit1', 'rabbit@rabbit2']},
           ?assertEqual(Expectation, autocluster_consul:nodelist()),
@@ -197,7 +197,7 @@ nodelist_test_() ->
           meck:expect(autocluster_httpc, get,
             fun(_, _, _, _, _) ->
               Body = "[{\"Node\": {\"Node\": \"rabbit2\", \"Address\": \"10.20.16.160\"}, \"Checks\": [{\"Node\": \"rabbit2\", \"CheckID\": \"service:rabbitmq\", \"Name\": \"Service \'rabbitmq\' check\", \"ServiceName\": \"rabbitmq\", \"Notes\": \"Connect to the port internally every 30 seconds\", \"Status\": \"passing\", \"ServiceID\": \"rabbitmq\", \"Output\": \"\"}, {\"Node\": \"rabbit2\", \"CheckID\": \"serfHealth\", \"Name\": \"Serf Health Status\", \"ServiceName\": \"\", \"Notes\": \"\", \"Status\": \"passing\", \"ServiceID\": \"\", \"Output\": \"Agent alive and reachable\"}], \"Service\": {\"Address\": \"\", \"Port\": 5672, \"ID\": \"rabbitmq\", \"Service\": \"rabbitmq\", \"Tags\": [\"amqp\"]}}, {\"Node\": {\"Node\": \"rabbit1\", \"Address\": \"10.20.16.159\"}, \"Checks\": [{\"Node\": \"rabbit1\", \"CheckID\": \"service:rabbitmq\", \"Name\": \"Service \'rabbitmq\' check\", \"ServiceName\": \"rabbitmq\", \"Notes\": \"Connect to the port internally every 30 seconds\", \"Status\": \"passing\", \"ServiceID\": \"rabbitmq\", \"Output\": \"\"}, {\"Node\": \"rabbit1\", \"CheckID\": \"serfHealth\", \"Name\": \"Serf Health Status\", \"ServiceName\": \"\", \"Notes\": \"\", \"Status\": \"passing\", \"ServiceID\": \"\", \"Output\": \"Agent alive and reachable\"}], \"Service\": {\"Address\": \"\", \"Port\": 5672, \"ID\": \"rabbitmq\", \"Service\": \"rabbitmq\", \"Tags\": [\"amqp\"]}}]",
-              json_decode(Body)
+              rabbit_misc:json_decode(Body)
             end),
           os:putenv("CONSUL_USE_LONGNAME", "true"),
           Expectation = {ok,['rabbit@rabbit1.node.consul', 'rabbit@rabbit2.node.consul']},
@@ -209,7 +209,7 @@ nodelist_test_() ->
           meck:expect(autocluster_httpc, get,
             fun(_, _, _, _, _) ->
               Body = "[{\"Node\": {\"Node\": \"rabbit2\", \"Address\": \"10.20.16.160\"}, \"Checks\": [{\"Node\": \"rabbit2\", \"CheckID\": \"service:rabbitmq\", \"Name\": \"Service \'rabbitmq\' check\", \"ServiceName\": \"rabbitmq\", \"Notes\": \"Connect to the port internally every 30 seconds\", \"Status\": \"passing\", \"ServiceID\": \"rabbitmq\", \"Output\": \"\"}, {\"Node\": \"rabbit2\", \"CheckID\": \"serfHealth\", \"Name\": \"Serf Health Status\", \"ServiceName\": \"\", \"Notes\": \"\", \"Status\": \"passing\", \"ServiceID\": \"\", \"Output\": \"Agent alive and reachable\"}], \"Service\": {\"Address\": \"\", \"Port\": 5672, \"ID\": \"rabbitmq\", \"Service\": \"rabbitmq\", \"Tags\": [\"amqp\"]}}, {\"Node\": {\"Node\": \"rabbit1\", \"Address\": \"10.20.16.159\"}, \"Checks\": [{\"Node\": \"rabbit1\", \"CheckID\": \"service:rabbitmq\", \"Name\": \"Service \'rabbitmq\' check\", \"ServiceName\": \"rabbitmq\", \"Notes\": \"Connect to the port internally every 30 seconds\", \"Status\": \"passing\", \"ServiceID\": \"rabbitmq\", \"Output\": \"\"}, {\"Node\": \"rabbit1\", \"CheckID\": \"serfHealth\", \"Name\": \"Serf Health Status\", \"ServiceName\": \"\", \"Notes\": \"\", \"Status\": \"passing\", \"ServiceID\": \"\", \"Output\": \"Agent alive and reachable\"}], \"Service\": {\"Address\": \"\", \"Port\": 5672, \"ID\": \"rabbitmq\", \"Service\": \"rabbitmq\", \"Tags\": [\"amqp\"]}}]",
-              json_decode(Body)
+              rabbit_misc:json_decode(Body)
             end),
           os:putenv("CONSUL_USE_LONGNAME", "true"),
           os:putenv("CONSUL_DOMAIN", "mydomain"),
@@ -222,7 +222,7 @@ nodelist_test_() ->
           meck:expect(autocluster_httpc, get,
             fun(_, _, _, _, _) ->
               Body = "[{\"Node\": {\"Node\": \"rabbit2.internal.domain\", \"Address\": \"10.20.16.160\"}, \"Checks\": [{\"Node\": \"rabbit2.internal.domain\", \"CheckID\": \"service:rabbitmq\", \"Name\": \"Service \'rabbitmq\' check\", \"ServiceName\": \"rabbitmq\", \"Notes\": \"Connect to the port internally every 30 seconds\", \"Status\": \"passing\", \"ServiceID\": \"rabbitmq:172.172.16.4.50\", \"Output\": \"\"}, {\"Node\": \"rabbit2.internal.domain\", \"CheckID\": \"serfHealth\", \"Name\": \"Serf Health Status\", \"ServiceName\": \"\", \"Notes\": \"\", \"Status\": \"passing\", \"ServiceID\": \"\", \"Output\": \"Agent alive and reachable\"}], \"Service\": {\"Address\": \"172.16.4.51\", \"Port\": 5672, \"ID\": \"rabbitmq:172.16.4.51\", \"Service\": \"rabbitmq\", \"Tags\": [\"amqp\"]}}, {\"Node\": {\"Node\": \"rabbit1.internal.domain\", \"Address\": \"10.20.16.159\"}, \"Checks\": [{\"Node\": \"rabbit1.internal.domain\", \"CheckID\": \"service:rabbitmq\", \"Name\": \"Service \'rabbitmq\' check\", \"ServiceName\": \"rabbitmq\", \"Notes\": \"Connect to the port internally every 30 seconds\", \"Status\": \"passing\", \"ServiceID\": \"rabbitmq\", \"Output\": \"\"}, {\"Node\": \"rabbit1.internal.domain\", \"CheckID\": \"serfHealth\", \"Name\": \"Serf Health Status\", \"ServiceName\": \"\", \"Notes\": \"\", \"Status\": \"passing\", \"ServiceID\": \"\", \"Output\": \"Agent alive and reachable\"}], \"Service\": {\"Address\": \"172.172.16.51\", \"Port\": 5672, \"ID\": \"rabbitmq:172.172.16.51\", \"Service\": \"rabbitmq\", \"Tags\": [\"amqp\"]}}]",
-              json_decode(Body)
+              rabbit_misc:json_decode(Body)
             end),
           Expectation = {ok,['rabbit@172.16.4.51','rabbit@172.172.16.51']},
           ?assertEqual(Expectation, autocluster_consul:nodelist()),
@@ -232,9 +232,9 @@ nodelist_test_() ->
         fun() ->
           meck:expect(autocluster_httpc, get,
             fun(_, _, _, _, []) ->
-                    json_decode(with_warnings());
+                    rabbit_misc:json_decode(with_warnings());
                (_, _, _, _, [passing]) ->
-                    json_decode(without_warnings())
+                    rabbit_misc:json_decode(without_warnings())
             end),
           os:putenv("CONSUL_INCLUDE_NODES_WITH_WARNINGS", "true"),
           Expectation = {ok,['rabbit@172.16.4.51']},
@@ -245,9 +245,9 @@ nodelist_test_() ->
         fun() ->
           meck:expect(autocluster_httpc, get,
             fun(_, _, _, _, []) ->
-                    json_decode(with_warnings());
+                    rabbit_misc:json_decode(with_warnings());
                (_, _, _, _, [passing]) ->
-                    json_decode(without_warnings())
+                    rabbit_misc:json_decode(without_warnings())
             end),
           Expectation = {ok,['rabbit@172.16.4.51', 'rabbit@172.172.16.51']},
           ?assertEqual(Expectation, autocluster_consul:nodelist()),
@@ -458,13 +458,12 @@ register_failure_test_() ->
         end
       },
       {"on json encode error",
-
         fun() ->
           meck:new(autocluster_consul, [passthrough]),
           meck:new(autocluster_log, [passthrough]),
           meck:expect(autocluster_consul, build_registration_body, 0, {foo}),
           meck:expect(autocluster_log, error, 2, ok),
-          ?assertEqual({error, badarg}, autocluster_consul:register()),
+          ?assertEqual({error,{bad_term,{foo}}}, autocluster_consul:register()),
           ?assert(meck:validate(autocluster_consul)),
           meck:unload(autocluster_consul),
           meck:unload(autocluster_log)
@@ -617,9 +616,6 @@ unregister_test_() ->
     ]
   }.
 
-json_decode(Body) ->
-    rabbit_json:try_decode(rabbit_data_coercion:to_binary(Body)).
-
 with_warnings() ->
     "[{\"Node\": {\"Node\": \"rabbit2.internal.domain\", \"Address\": \"10.20.16.160\"}, \"Checks\": [{\"Node\": \"rabbit2.internal.domain\", \"CheckID\": \"service:rabbitmq\", \"Name\": \"Service \'rabbitmq\' check\", \"ServiceName\": \"rabbitmq\", \"Notes\": \"Connect to the port internally every 30 seconds\", \"Status\": \"warning\", \"ServiceID\": \"rabbitmq:172.172.16.4.50\", \"Output\": \"\"}, {\"Node\": \"rabbit2.internal.domain\", \"CheckID\": \"serfHealth\", \"Name\": \"Serf Health Status\", \"ServiceName\": \"\", \"Notes\": \"\", \"Status\": \"passing\", \"ServiceID\": \"\", \"Output\": \"Agent alive and reachable\"}], \"Service\": {\"Address\": \"172.16.4.51\", \"Port\": 5672, \"ID\": \"rabbitmq:172.16.4.51\", \"Service\": \"rabbitmq\", \"Tags\": [\"amqp\"]}}, {\"Node\": {\"Node\": \"rabbit1.internal.domain\", \"Address\": \"10.20.16.159\"}, \"Checks\": [{\"Node\": \"rabbit1.internal.domain\", \"CheckID\": \"service:rabbitmq\", \"Name\": \"Service \'rabbitmq\' check\", \"ServiceName\": \"rabbitmq\", \"Notes\": \"Connect to the port internally every 30 seconds\", \"Status\": \"critical\", \"ServiceID\": \"rabbitmq\", \"Output\": \"\"}, {\"Node\": \"rabbit1.internal.domain\", \"CheckID\": \"serfHealth\", \"Name\": \"Serf Health Status\", \"ServiceName\": \"\", \"Notes\": \"\", \"Status\": \"passing\", \"ServiceID\": \"\", \"Output\": \"Agent alive and reachable\"}], \"Service\": {\"Address\": \"172.172.16.51\", \"Port\": 5672, \"ID\": \"rabbitmq:172.172.16.51\", \"Service\": \"rabbitmq\", \"Tags\": [\"amqp\"]}}]".
 
@@ -627,10 +623,9 @@ without_warnings() ->
     "[{\"Node\": {\"Node\": \"rabbit2.internal.domain\", \"Address\": \"10.20.16.160\"}, \"Checks\": [{\"Node\": \"rabbit2.internal.domain\", \"CheckID\": \"service:rabbitmq\", \"Name\": \"Service \'rabbitmq\' check\", \"ServiceName\": \"rabbitmq\", \"Notes\": \"Connect to the port internally every 30 seconds\", \"Status\": \"passing\", \"ServiceID\": \"rabbitmq:172.172.16.4.50\", \"Output\": \"\"}, {\"Node\": \"rabbit2.internal.domain\", \"CheckID\": \"serfHealth\", \"Name\": \"Serf Health Status\", \"ServiceName\": \"\", \"Notes\": \"\", \"Status\": \"passing\", \"ServiceID\": \"\", \"Output\": \"Agent alive and reachable\"}], \"Service\": {\"Address\": \"172.16.4.51\", \"Port\": 5672, \"ID\": \"rabbitmq:172.16.4.51\", \"Service\": \"rabbitmq\", \"Tags\": [\"amqp\"]}}, {\"Node\": {\"Node\": \"rabbit1.internal.domain\", \"Address\": \"10.20.16.159\"}, \"Checks\": [{\"Node\": \"rabbit1.internal.domain\", \"CheckID\": \"service:rabbitmq\", \"Name\": \"Service \'rabbitmq\' check\", \"ServiceName\": \"rabbitmq\", \"Notes\": \"Connect to the port internally every 30 seconds\", \"Status\": \"passing\", \"ServiceID\": \"rabbitmq\", \"Output\": \"\"}, {\"Node\": \"rabbit1.internal.domain\", \"CheckID\": \"serfHealth\", \"Name\": \"Serf Health Status\", \"ServiceName\": \"\", \"Notes\": \"\", \"Status\": \"passing\", \"ServiceID\": \"\", \"Output\": \"Agent alive and reachable\"}], \"Service\": {\"Address\": \"172.172.16.51\", \"Port\": 5672, \"ID\": \"rabbitmq:172.172.16.51\", \"Service\": \"rabbitmq\", \"Tags\": [\"amqp\"]}}]".
 
 get_session_id_test() ->
-  Session = #{<<"ID">> => <<"session-id">>},
   ?assertEqual("session-id",
-               autocluster_consul:get_session_id(Session)).
-
+               autocluster_consul:get_session_id({struct,[{<<"ID">>,
+                                                           <<"session-id">>}]})).
 startup_lock_path_test_() ->
   {
     foreach,
@@ -675,7 +670,7 @@ create_session_test_() ->
               ?assertEqual([], Args),
               Expect = <<"{\"Name\":\"node-name\",\"TTL\":\"30s\"}">>,
               ?assertEqual(Expect, Body),
-              {ok, #{<<"ID">> => <<"session-id">>}}
+              {ok, {struct,[{<<"ID">>, <<"session-id">>}]}}
             end),
           ?assertEqual({ok, "session-id"}, autocluster_consul:create_session("node-name", 30)),
           ?assert(meck:validate(autocluster_httpc))
@@ -691,7 +686,7 @@ create_session_test_() ->
             ?assertEqual([{token, "token-value"}], Args),
             Expect = <<"{\"Name\":\"node-name\",\"TTL\":\"30s\"}">>,
             ?assertEqual(Expect, Body),
-            {ok, #{<<"ID">> => <<"session-id">>}}
+            {ok, {struct,[{<<"ID">>, <<"session-id">>}]}}
           end),
         os:putenv("CONSUL_ACL_TOKEN", "token-value"),
         ?assertEqual({ok, "session-id"}, autocluster_consul:create_session("node-name", 30)),
@@ -720,13 +715,13 @@ get_lock_status_test_() ->
               ?assertEqual(8500, Port),
               ?assertEqual([v1, kv, "rabbitmq", "default", "startup_lock"], Path),
               ?assertEqual([], Args),
-              {ok,[[{<<"LockIndex">>,3},
+              {ok,[{struct,[{<<"LockIndex">>,3},
                             {<<"Key">>,<<"rabbitmq/default/startup_lock">>},
                             {<<"Flags">>,0},
                             {<<"Value">>,<<"W3t9XQ==">>},
                             {<<"Session">>,<<"session-id">>},
                             {<<"CreateIndex">>,8},
-                            {<<"ModifyIndex">>,21}]]}
+                            {<<"ModifyIndex">>,21}]}]}
             end),
           ?assertEqual({ok, {true, 21}}, autocluster_consul:get_lock_status()),
           ?assert(meck:validate(autocluster_httpc))
@@ -740,12 +735,12 @@ get_lock_status_test_() ->
               ?assertEqual(8500, Port),
               ?assertEqual([v1, kv, "rabbitmq", "default", "startup_lock"], Path),
               ?assertEqual([], Args),
-              {ok,[[{<<"LockIndex">>,3},
+              {ok,[{struct,[{<<"LockIndex">>,3},
                             {<<"Key">>,<<"rabbitmq/default/startup_lock">>},
                             {<<"Flags">>,0},
                             {<<"Value">>,<<"W3t9XQ==">>},
                             {<<"CreateIndex">>,8},
-                            {<<"ModifyIndex">>,21}]]}
+                            {<<"ModifyIndex">>,21}]}]}
             end),
           ?assertEqual({ok, {false, 21}}, autocluster_consul:get_lock_status()),
           ?assert(meck:validate(autocluster_httpc))
@@ -759,12 +754,12 @@ get_lock_status_test_() ->
                 ?assertEqual(8500, Port),
                 ?assertEqual([v1, kv, "rabbitmq", "default", "startup_lock"], Path),
                 ?assertEqual([{token, "token-value"}], Args),
-                {ok,[[{<<"LockIndex">>,3},
+                {ok,[{struct,[{<<"LockIndex">>,3},
                               {<<"Key">>,<<"rabbitmq/default/startup_lock">>},
                               {<<"Flags">>,0},
                               {<<"Value">>,<<"W3t9XQ==">>},
                               {<<"CreateIndex">>,8},
-                              {<<"ModifyIndex">>,21}]]}
+                              {<<"ModifyIndex">>,21}]}]}
               end),
             os:putenv("CONSUL_ACL_TOKEN", "token-value"),
             ?assertEqual({ok, {false, 21}}, autocluster_consul:get_lock_status()),
